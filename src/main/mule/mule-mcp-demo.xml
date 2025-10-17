@@ -23,7 +23,7 @@
     <!-- Flow: retrive-empname-by-id -->
     <flow name="retrive-empname-by-id">
         <mcp:tool-listener doc:name="MCP Server - Tool Listener" config-ref="MCP_Server" name="retrive-empname-by-id">
-            <mcp:description><![CDATA[Retrieve employee name by its ID]]></mcp:description>
+            <mcp:description><![CDATA[Retrieve employee name by employee id]]></mcp:description>
             <mcp:parameters-schema><![CDATA[
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
