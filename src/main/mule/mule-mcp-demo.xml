@@ -92,7 +92,7 @@ if (sizeOf(result) > 0) result else {"message": "Employee not found"}
   "properties": {
     "contactno": {
       "type": "string",
-      "description": "Contact number to retrieve the employee name"
+      "description": "Contact number to retrieve the name of an employee"
     }
   },
   "required": ["contactno"]
