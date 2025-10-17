@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:mcp="http://www.mulesoft.org/schema/mule/mcp"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/mcp http://www.mulesoft.org/schema/mule/mcp/current/mule-mcp.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+
+    <http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config">
+        <http:listener-connection host="0.0.0.0" port="8081"/>
+    </http:listener-config>
+
+    <mcp:server-config name="MCP_Server" doc:name="MCP Server" serverName="mule-mcp-server" serverVersion="1.0.0">
+        <mcp:sse-server-connection listenerConfig="HTTP_Listener_config"/>
+    </mcp:server-config>
+
+    <!-- Flow: retrive-empname-by-id -->
+    <flow name="retrive-empname-by-id">
+        <mcp:tool-listener doc:name="MCP Server - Tool Listener" config-ref="MCP_Server" name="retrive-empname-by-id">
+            <mcp:description><![CDATA[Retrieve employee name by employee id]]></mcp:description>
+            <mcp:parameters-schema><![CDATA[
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "empid": {
+      "type": "string",
+      "description": "Employee ID to retrieve the name of an employee"
+    }
+  },
+  "required": ["empid"]
+}
+]]></mcp:parameters-schema>
+            <mcp:responses>
+                <mcp:text-tool-response-content text="#[payload]"/>
+            </mcp:responses>
+        </mcp:tool-listener>
+
+        <logger level="INFO" message="Entered into retrieve the name of an employee"/>
+        <ee:transform doc:name="Transform Message">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+var employees = [
+  {
+    "empid": "E101",
+    "empname": "Amit Sharma",
+    "contactno": "9876543210",
+    "address": "Hyderabad, Telangana",
+    "salary": 75000,
+    "grade": "A"
+  },
+  {
+    "empid": "E102",
+    "empname": "Priya Reddy",
+    "contactno": "9123456780",
+    "address": "Bangalore, Karnataka",
+    "salary": 68000,
+    "grade": "B"
+  },
+  {
+    "empid": "E103",
+    "empname": "Rahul Verma",
+    "contactno": "9988776655",
+    "address": "Pune, Maharashtra",
+    "salary": 72000,
+    "grade": "A"
+  }
+]
+var result = employees filter (e) -> upper(e.empid) == upper(attributes.parameters.empid)
+---
+if (sizeOf(result) > 0) result else {"message": "Employee not found"}
+]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+
+    <!-- Flow: retrive-empname-by-contactno -->
+    <flow name="retrive-empname-by-contactno">
+        <mcp:tool-listener doc:name="MCP Server - Tool Listener" config-ref="MCP_Server" name="retrive-empname-by-contactno">
+            <mcp:description><![CDATA[Retrieve employee name by contact number]]></mcp:description>
+            <mcp:parameters-schema><![CDATA[
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "contactno": {
+      "type": "string",
+      "description": "Contact number to retrieve the employee name"
+    }
+  },
+  "required": ["contactno"]
+}
+]]></mcp:parameters-schema>
+            <mcp:responses>
+                <mcp:text-tool-response-content text="#[payload]"/>
+            </mcp:responses>
+        </mcp:tool-listener>
+
+        <logger level="INFO" message="Entered into retrieve the contact number of an employee"/>
+        <ee:transform doc:name="Transform Message">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+var employees = [
+  {
+    "empid": "E101",
+    "empname": "Amit Sharma",
+    "contactno": "9876543210",
+    "address": "Hyderabad, Telangana",
+    "salary": 75000,
+    "grade": "A"
+  },
+  {
+    "empid": "E102",
+    "empname": "Priya Reddy",
+    "contactno": "9123456780",
+    "address": "Bangalore, Karnataka",
+    "salary": 68000,
+    "grade": "B"
+  },
+  {
+    "empid": "E103",
+    "empname": "Rahul Verma",
+    "contactno": "9988776655",
+    "address": "Pune, Maharashtra",
+    "salary": 72000,
+    "grade": "A"
+  }
+]
+var result = employees filter (e) -> e.contactno == attributes.parameters.contactno
+---
+if (sizeOf(result) > 0) result else {"message": "Employee not found"}
+]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+
+</mule>
