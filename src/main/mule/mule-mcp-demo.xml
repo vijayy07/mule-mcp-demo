@@ -31,7 +31,7 @@
   "properties": {
     "empid": {
       "type": "string",
-      "description": "Employee ID to retrieve the name"
+      "description": "Employee ID to retrieve the name of an employee"
     }
   },
   "required": ["empid"]
